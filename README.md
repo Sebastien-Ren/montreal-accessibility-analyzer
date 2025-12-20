@@ -1,4 +1,4 @@
-# montreal-accessibility-analyzer
+# Montreal Accessibility Analyzer
 
 ## Motivation
 
