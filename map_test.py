@@ -5,6 +5,7 @@ import osmnx
 import geopandas
 import matplotlib
 from shapely import Point
+from folium.plugins import HeatMap
 
 m = folium.Map(location=(45.5019, -73.5674), control_scale=True, zoom_start=15)
 
@@ -87,6 +88,63 @@ boundary.add_to(m)
 
 folium.LayerControl().add_to(m)
 
+#reproject all points from (lat/lon degrees) to a metric CRS
+pts_in_boundary = pts_in_boundary.to_crs(3857)
+mtl_pts_of_interest = mtl_pts_of_interest.to_crs(3857)
 
+#calculating distances of each grid point to ALL grocery stores
+distances_list = []
+for point in pts_in_boundary.geometry:
+    temp_distances = []
+    for grocery in mtl_pts_of_interest.geometry:
+        temp_distances.append(point.distance(grocery))
+    
+    distances_list.append(min(temp_distances))
+
+pts_in_boundary['nearest_distance'] = distances_list
+
+# Basic stats
+print(f"Minimum distance: {pts_in_boundary['nearest_distance'].min()} meters")
+print(f"Maximum distance: {pts_in_boundary['nearest_distance'].max()} meters")
+print(f"Average distance: {pts_in_boundary['nearest_distance'].mean()} meters")
+print(f"Median distance: {pts_in_boundary['nearest_distance'].median()} meters \n")
+
+#scoring function
+def scoring_distance(distance):
+    if(distance >= 0 and distance < 500):
+        return 5
+    elif(distance >= 500 and distance < 1000):
+        return 4
+    elif(distance >= 1000 and distance < 2000):
+        return 3
+    elif(distance >= 2000 and distance < 3000):
+        return 2
+    elif(distance >= 3000):
+        return 1
+
+#apply scoring function to distances in dataframe
+pts_in_boundary['accessibility_score'] = pts_in_boundary['nearest_distance'].apply(scoring_distance)
+
+#STATISTICS
+print("KEY FINDINGS:")
+
+# How many pts in each score category?
+count = pts_in_boundary['accessibility_score'].value_counts()
+print(f"# of pts in each score category: \n {count} \n")
+
+# What % of mtl has good access (scores 4-5)?
+count_good = count[4] + count[5]
+total = len(pts_in_boundary)
+percentage_good = (count_good / total) * 100
+print(f"{percentage_good:.1f}% of Montreal has good access to grocery stores \n")
+
+# What % of mtl has poor access (scores 1-2)?
+count_poor = count[1] + count[2]
+percentage_poor = (count_poor / total) * 100
+print(f"{percentage_poor:.1f}% of Montreal has poor access to grocery stores \n")
+
+# What is the average accessibility score?
+average_score = pts_in_boundary['accessibility_score'].mean()
+print(f"Average accessibility score: {average_score:.2f} \n")
 
 m.save("index.html")
