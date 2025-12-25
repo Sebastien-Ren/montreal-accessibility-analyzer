@@ -35,7 +35,7 @@ pts_in_boundary = gdf.sjoin(mtl_boundaries, how="inner")
 
 #print(pts_in_boundary.head())
 
-
+points_layer = folium.FeatureGroup(name="grid points", show=False)
 
 #adding grid points to folium map to visualize, icon color as green
 for row in pts_in_boundary.itertuples():
@@ -46,7 +46,9 @@ for row in pts_in_boundary.itertuples():
         fill=True,
         fillColor="green",
         fillOpacity=0.6
-    ).add_to(m)
+    ).add_to(points_layer)
+
+points_layer.add_to(m)
 
 folium.GeoJson(mtl_boundaries).add_to(boundary)
 
@@ -54,7 +56,6 @@ mtl_pts_of_interest = osmnx.features.features_from_place("Montreal", {'shop': ['
 
 #filter for only points, no polygons for now
 mtl_pts_of_interest = mtl_pts_of_interest[mtl_pts_of_interest.geometry.type == 'Point']
-
 grocery_stores = folium.FeatureGroup(name="grocery stores")
 
 #iterate through grocery stores
@@ -85,8 +86,6 @@ boundary.add_to(m)
 
 #print(mtl_pts_of_interest.head())
 #print(mtl_pts_of_interest.columns)
-
-folium.LayerControl().add_to(m)
 
 #reproject all points from (lat/lon degrees) to a metric CRS
 pts_in_boundary = pts_in_boundary.to_crs(3857)
@@ -146,5 +145,24 @@ print(f"{percentage_poor:.1f}% of Montreal has poor access to grocery stores \n"
 # What is the average accessibility score?
 average_score = pts_in_boundary['accessibility_score'].mean()
 print(f"Average accessibility score: {average_score:.2f} \n")
+
+pts_for_viz = pts_in_boundary.to_crs('EPSG:4326')
+
+#prep data for heatmap
+heat_data = []
+for index, row in pts_for_viz.iterrows():
+    lat = row.geometry.y
+    lon = row.geometry.x
+    score = row['accessibility_score']
+    heat_data.append([lat, lon, score])
+
+print(heat_data[:5])
+
+heat_layer = folium.FeatureGroup(name="heat map")
+
+HeatMap(heat_data, radius=25, blur=20).add_to(heat_layer)
+
+heat_layer.add_to(m)
+folium.LayerControl().add_to(m)
 
 m.save("index.html")
