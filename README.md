@@ -1,6 +1,6 @@
 # Montreal Accessibility Analyzer
 
-![Accessibility Map](images/screenshot.png)
+![Accessibility Map](images/screenshot.jpg)
 
 Food accessibility is a critical urban planning issue that directly impacts community health and equity.
 This project analyzes grocery store accessibility across Montreal to identify which neighborhoods are well-served and which face barriers to accessing fresh food.
