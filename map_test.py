@@ -156,7 +156,7 @@ for index, row in pts_for_viz.iterrows():
     score = row['accessibility_score']
     heat_data.append([lat, lon, score])
 
-print(heat_data[:5])
+#print(heat_data[:5])
 
 heat_layer = folium.FeatureGroup(name="heat map")
 
@@ -164,5 +164,19 @@ HeatMap(heat_data, radius=25, blur=20).add_to(heat_layer)
 
 heat_layer.add_to(m)
 folium.LayerControl().add_to(m)
+
+#SOCIOECONOMIC ANALYSIS (INCOME)
+
+income_geodata = geopandas.read_file("geos.geojson")
+income_csv = pd.read_csv('data.csv')
+
+#merge both dataframes
+income_geodata['id'] = income_geodata['id'].astype(str)
+income_csv['GeoUID'] = income_csv['GeoUID'].astype(str)
+
+income_data = pd.merge(income_geodata, income_csv, left_on='id', right_on='GeoUID')
+
+print(income_data.head())
+print(income_data.columns)
 
 m.save("index.html")
