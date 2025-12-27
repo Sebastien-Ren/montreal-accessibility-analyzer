@@ -1,6 +1,6 @@
 # Montreal Accessibility Analyzer
 
-![Accessibility Map](images/screenshot.jpg)
+![Accessibility Map](images/map_with_income.jpeg)
 
 Food accessibility is a critical urban planning issue that directly impacts community health and equity.
 This project analyzes grocery store accessibility across Montreal to identify which neighborhoods are well-served and which face barriers to accessing fresh food.
@@ -35,25 +35,32 @@ This project analyzes grocery store accessibility across Montreal to identify wh
 
 ## Key Findings
 
-Montreal's grocery accessibility reveals significant geographic disparities:
+This analysis reveals a counterintuitive pattern in Montreal's grocery accessibility:
 
-**Overall Access:**
+**Income-Accessibility Relationship:**
+
+- **High-income areas (median $48k+) have 38% worse grocery accessibility** than low-income areas (median <$34k)
+- Low-income neighborhoods: Average accessibility score of **3.67** (moderate to good access)
+- High-income neighborhoods: Average accessibility score of **2.26** (poor access)
+
+**Why This Happens:**
+
+This reflects Montreal's urban geography—lower-income neighborhoods tend to be located in denser, central areas with better walkability and proximity to services, while higher-income residents often live in suburban areas with larger properties but greater car dependency and distances to grocery stores.
+
+**Overall Access Patterns:**
 
 - Only **38.3%** of analyzed locations have good accessibility (within 1km of a grocery store)
 - **34.9%** face poor accessibility (over 2km from nearest store)
 - Average accessibility score: **2.97 out of 5** (just below moderate)
 
-**Distance Patterns:**
+**Distance Metrics:**
 
 - **Minimum:** 35m (some locations adjacent to stores)
 - **Maximum:** 10.8km (peripheral areas significantly underserved)
 - **Median:** 1.4km (half of Montreal within walking/biking distance)
 
-**Geographic Insights:**
-
-- Central Montreal and major commercial corridors show strong accessibility
-- Peripheral neighborhoods and areas near Westmount, Côte-Saint-Luc show accessibility gaps
-- Store clustering creates "food oases" while leaving coverage gaps between clusters
+**Policy Implications:**
+While wealthy areas have worse measured accessibility, this doesn't necessarily indicate inequity—high-income residents typically have car access. However, the finding highlights that **car dependency increases with income** in Montreal, while lower-income residents rely more on walkable access to essential services.
 
 ## Technologies Used
 

@@ -163,7 +163,6 @@ heat_layer = folium.FeatureGroup(name="heat map")
 HeatMap(heat_data, radius=25, blur=20).add_to(heat_layer)
 
 heat_layer.add_to(m)
-folium.LayerControl().add_to(m)
 
 #SOCIOECONOMIC ANALYSIS (INCOME)
 
@@ -176,7 +175,45 @@ income_csv['GeoUID'] = income_csv['GeoUID'].astype(str)
 
 income_data = pd.merge(income_geodata, income_csv, left_on='id', right_on='GeoUID')
 
-print(income_data.head())
-print(income_data.columns)
+#convert back to geodataframe
+income_data = geopandas.GeoDataFrame(income_data, geometry='geometry', crs='EPSG:4326')
+pts_in_boundary = pts_in_boundary.to_crs('EPSG:4326')
 
+if 'index_right' in pts_in_boundary.columns:
+    pts_in_boundary = pts_in_boundary.drop(columns=['index_right'])
+
+#spatial join
+pts_with_income = geopandas.sjoin(pts_in_boundary, income_data, how='left', predicate='within')
+
+#removing NaN rows
+pts_with_income_clean = pts_with_income.dropna(subset=['v_CA21_560: Median total income in 2020 among recipients ($)'])
+
+#print(pts_with_income_clean.head())
+
+#get income thresholds
+income_25th = pts_with_income_clean['v_CA21_560: Median total income in 2020 among recipients ($)'].quantile(0.25)
+income_75th = pts_with_income_clean['v_CA21_560: Median total income in 2020 among recipients ($)'].quantile(0.75)
+
+#filter data into two groups
+low_income_pts = pts_with_income_clean[pts_with_income_clean['v_CA21_560: Median total income in 2020 among recipients ($)'] < income_25th]
+high_income_pts = pts_with_income_clean[pts_with_income_clean['v_CA21_560: Median total income in 2020 among recipients ($)'] > income_75th]
+
+low_income_avg = low_income_pts['accessibility_score'].mean()
+high_income_avg = high_income_pts['accessibility_score'].mean()
+
+#simple analytics
+raw_diff = abs(low_income_avg - high_income_avg)
+perc_diff = abs((high_income_avg - low_income_avg) / low_income_avg) * 100
+
+#remove NaN income tracts
+income_data_clean = income_data.dropna(subset=['v_CA21_560: Median total income in 2020 among recipients ($)'])
+
+income_data_clean = income_data_clean.rename(columns={
+    'v_CA21_560: Median total income in 2020 among recipients ($)': 'median_income'
+})
+
+#adding choropleth map of income relation to map
+folium.Choropleth(income_data_clean, income_data_clean[['GeoUID', 'median_income']], ['GeoUID', 'median_income'], key_on='feature.properties.GeoUID', fill_color='BuPu', name="Median Income", legend_name="Median Household Income ($)", overlay=True, control=True).add_to(m)
+
+folium.LayerControl().add_to(m)
 m.save("index.html")
