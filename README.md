@@ -11,6 +11,8 @@ This project analyzes grocery store accessibility across Montreal to identify wh
 - **827 analysis points** covering the entire city boundary
 - **Distance calculations** from every location to nearest grocery store
 - **5-point accessibility scoring system** (1=Very Poor to 5=Excellent)
+- **Socioeconomic analysis** revealing income-based accessibility disparities
+- **Income choropleth layer** showing median household income by census tract
 - **Toggleable map layers** for boundary, grocery stores, and accessibility heatmap
 - **Store information popups** displaying name, brand, and opening hours
 - **Statistical analysis** of citywide accessibility patterns
@@ -19,10 +21,14 @@ This project analyzes grocery store accessibility across Montreal to identify wh
 
 - **OpenStreetMap (OSM)** - Grocery store locations
 - **OSMnx** - Montreal adiministrative boundary and geographic data
+- **CensusMapper / Statistics Canada Census 2021** - Median household income by census tract (169 tracts)
+- All data retrieved December 2025
 
 ## Methodology
 
-1. **Data Collection**: Retrieved Montreal's city boundary and 313 grocery store locations from OpenStreetMap using OSMnx
+1. **Data Collection**:
+   - Retrieved Montreal's city boundary and 313 grocery store locations from OpenStreetMap using OSMnx
+   - Downloaded Census 2021 income data via CensusMapper API
 2. **Grid Generation**: Created 2,500 evenly-spaced points across Montreal's bounding box, filtered to 827 points within city boundaries
 3. **Distance Calculation**: Reprojected data to EPSG:32188 (NAD83/Quebec Lambert) for metric calculations; computed straight-line distance from each grid point to nearest store
 4. **Accessibility Scoring**: Applied 5-tier scoring system:
@@ -31,7 +37,12 @@ This project analyzes grocery store accessibility across Montreal to identify wh
    - Score 3 (Moderate): 1000-2000m
    - Score 2 (Poor): 2000-3000m
    - Score 1 (Very Poor): 3000m+
-5. **Visualization**: Generated interactive heatmap using Folium, with color intensity representing accessibility levels
+5. **Socioeconomic Analysis**:
+   - Spatially joined grid points with census tract income data
+   - Compared accessibility scores between income quartiles (bottom 25% vs top 25%)
+6. **Visualization**:
+   - Generated interactive heatmap using Folium, with color intensity representing accessibility levels
+   - Income choropleth showing census tracts colored by median income
 
 ## Key Findings
 
@@ -72,6 +83,7 @@ While wealthy areas have worse measured accessibility, this doesn't necessarily 
 - **Pandas** - Data processing and analysis
 - **NumPy** - Numerical computations and grid generation
 - **Shapely** - Geometric operations
+- **CensusMapper API** - Census data retrieval
 
 ## How to Run Locally
 
@@ -94,6 +106,7 @@ While wealthy areas have worse measured accessibility, this doesn't necessarily 
 ### Notes
 
 - First run may take a few minutes to download OSM data
+- CensusMapper data cached locally after first download
 
 ## Project Structure
 
