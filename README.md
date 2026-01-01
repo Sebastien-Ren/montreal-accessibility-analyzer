@@ -1,21 +1,16 @@
-# Montreal Accessibility Analyzer
+# Grocery Accessibility Analyzer
 
 ![Accessibility Map](images/map_with_income.jpeg)
 
 Food accessibility is a critical urban planning issue that directly impacts community health and equity.
-This project analyzes grocery store accessibility across Montreal to identify which neighborhoods are well-served and which face barriers to accessing fresh food.
+This project is a **city-agnostic** spatial analysis tool that calculates grocery accessibility across any city and reveals income-based disparities (where data is available)
 
 ## Features
 
-- **Interactive accessibility heatmap** showing grocery access patterns across Montreal
-- **827 analysis points** covering the entire city boundary
-- **Distance calculations** from every location to nearest grocery store
-- **5-point accessibility scoring system** (1=Very Poor to 5=Excellent)
-- **Socioeconomic analysis** revealing income-based accessibility disparities
-- **Income choropleth layer** showing median household income by census tract
-- **Toggleable map layers** for boundary, grocery stores, and accessibility heatmap
-- **Store information popups** displaying name, brand, and opening hours
-- **Statistical analysis** of citywide accessibility patterns
+- **Works for any city worldwide** - Automatically fetches boundaries and grocery stores via OpenStreetMap
+- **Accessibility Heatmap** - Visual overlay showing walkability to grocery stores
+- **Income Analysis** (Montreal only currently) - Reveals socioeconomic accessibility disparities
+- **Interactive Map** - Toggleable layers for exploration
 
 ## Data Sources
 
@@ -29,7 +24,7 @@ This project analyzes grocery store accessibility across Montreal to identify wh
 1. **Data Collection**:
    - Retrieved Montreal's city boundary and 313 grocery store locations from OpenStreetMap using OSMnx
    - Downloaded Census 2021 income data via CensusMapper API
-2. **Grid Generation**: Created 2,500 evenly-spaced points across Montreal's bounding box, filtered to 827 points within city boundaries
+2. **Grid Generation**: 500 meters between analysis points for consistent city comparisons
 3. **Distance Calculation**: Reprojected data to EPSG:32188 (NAD83/Quebec Lambert) for metric calculations; computed straight-line distance from each grid point to nearest store
 4. **Accessibility Scoring**: Applied 5-tier scoring system:
    - Score 5 (Excellent): 0-500m
@@ -44,7 +39,7 @@ This project analyzes grocery store accessibility across Montreal to identify wh
    - Generated interactive heatmap using Folium, with color intensity representing accessibility levels
    - Income choropleth showing census tracts colored by median income
 
-## Key Findings
+## Key Findings (Montreal)
 
 This analysis reveals a counterintuitive pattern in Montreal's grocery accessibility:
 
@@ -100,21 +95,26 @@ While wealthy areas have worse measured accessibility, this doesn't necessarily 
 
 ### Usage
 
-1. Run the analysis
-2. View the results
+Run analysis for any city:
+
+```python
+from analyzer import analyze_city
+
+# Basic analysis (works for any city)
+analyze_city("Toronto")
+
+# Montreal includes income disparity analysis
+analyze_city("Montreal")
+```
 
 ### Notes
 
 - First run may take a few minutes to download OSM data
 - CensusMapper data cached locally after first download
 
-## Project Structure
+## Limitations & Future Work
 
-```
-montreal-accessibility-analyzer/
-├── venv/                      # Virtual environment (not in repo)
-├── map_test.py               # Main analysis script
-├── index.html                # Generated interactive map
-├── README.md                 # Project documentation
-└── .gitignore               # Git ignore file
-```
+- **Income analysis:** - Currently only available for Montreal (requires manual census data download)
+- **Store data:** - Depends on OpenStreetMap completness
+- **Performance:** - Large cities may take a while to analyze
+- **Future:** - Automate census data fetching via API for more cities
